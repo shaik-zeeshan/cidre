@@ -503,6 +503,14 @@ impl arc::A<ContentFilter> {
         display: &sc::Display,
         windows: &ns::Array<sc::Window>,
     ) -> arc::Retained<ContentFilter>;
+
+    #[objc::msg_send(initWithDisplay:excludingApplications:exceptingWindows:)]
+    pub fn init_with_display_excluding_applications_execpting_windows(
+        self,
+        display: &sc::Display,
+        applications: &ns::Array<sc::RunningApp>,
+        windows: &ns::Array<sc::Window>,
+    ) -> arc::Retained<ContentFilter>;
 }
 
 impl ContentFilter {
@@ -518,6 +526,18 @@ impl ContentFilter {
         windows: &ns::Array<sc::Window>,
     ) -> arc::R<Self> {
         Self::alloc().init_with_display_excluding_windows(display, windows)
+    }
+
+    pub fn with_display_excluding_applications_windows(
+        display: &sc::Display,
+        applications: &ns::Array<sc::RunningApp>,
+        windows: &ns::Array<sc::Window>,
+    ) -> arc::R<Self> {
+        Self::alloc().init_with_display_excluding_applications_execpting_windows(
+            display,
+            applications,
+            windows,
+        )
     }
 
     #[objc::msg_send(style)]
