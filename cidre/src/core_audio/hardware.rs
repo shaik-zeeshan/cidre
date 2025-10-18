@@ -501,7 +501,7 @@ impl PropSelector {
     pub const AGGREGATE_DEVICE_SUB_TAP_LIST: Self = Self(u32::from_be_bytes(*b"atap"));
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 #[repr(transparent)]
 pub struct Device(pub Obj);
 
@@ -527,8 +527,22 @@ impl Device {
         )
     }
 
+    pub fn is_unknown(&self) -> bool {
+        self.0 == Obj::UNKNOWN
+    }
+
     pub fn uid(&self) -> os::Result<arc::R<cf::String>> {
         self.cf_prop(&PropSelector::DEVICE_UID.global_addr())
+    }
+
+    pub fn is_alive(&self) -> os::Result<bool> {
+        let res: u32 = self.prop(&PropSelector::DEVICE_IS_ALIVE.global_addr())?;
+        Ok(res == 1)
+    }
+
+    pub fn is_running(&self) -> os::Result<bool> {
+        let res: u32 = self.prop(&PropSelector::DEVICE_IS_RUNNING.global_addr())?;
+        Ok(res == 1)
     }
 
     pub fn nominal_sample_rate(&self) -> os::Result<f64> {
@@ -1907,10 +1921,22 @@ mod tests {
     };
 
     #[test]
+    fn device_uid() {
+        let uid = cf::str!(c"BuiltInSpeakerDevice");
+        let device = Device::with_uid(uid).unwrap();
+        let uid0 = device.uid().unwrap();
+        let uid1 = device.uid().unwrap();
+
+        // uid is copied
+        unsafe { assert_ne!(uid0.as_type_ptr(), uid1.as_type_ptr()) };
+    }
+
+    #[test]
     fn device() {
         let uid = cf::str!(c"BuiltInSpeakerDevice");
         let device = Device::with_uid(uid).unwrap();
         let uid_from_device = device.uid().unwrap();
+
         assert_eq!(uid, uid_from_device.as_ref());
         unsafe { assert_ne!(uid.as_type_ptr(), uid_from_device.as_type_ptr()) };
         let uid2 = uid.retained();

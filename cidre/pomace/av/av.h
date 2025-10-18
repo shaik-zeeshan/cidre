@@ -45,6 +45,10 @@ Class AV_OUTPUT_SETTINGS_ASSISTANT;
 
 Class AV_AUDIO_TIME;
 Class AV_AUDIO_MIXER_NODE;
+Class AV_AUDIO_MIX;
+Class AV_MUTABLE_AUDIO_MIX;
+Class AV_AUDIO_MIX_INPUT_PARAMETERS;
+Class AV_MUTABLE_AUDIO_MIX_INPUT_PARAMETERS;
 
 Class AV_AUDIO_UNIT_EQ;
 Class AV_AUDIO_UNIT_EFFECT;
@@ -58,6 +62,10 @@ Class AV_AUDIO_FILE;
 Class AV_AUDIO_CHANNEL_LAYOUT;
 
 Class AV_PLAYER;
+Class AV_QUEUE_PLAYER;
+Class AV_PLAYER_ITEM;
+Class AV_PLAYER_ITEM_VIDEO_OUTPUT;
+Class AV_PLAYER_LOOPER;
 
 Class AV_SAMPLE_BUFFER_DISPLAY_LAYER;
 Class AV_SAMPLE_BUFFER_VIDEO_RENDERER;
@@ -139,6 +147,11 @@ static void av_initializer(void)
 #endif
         AV_AUDIO_SESSION = [AVAudioSession class];
 #endif
+        
+        AV_AUDIO_MIX = [AVAudioMix class];
+        AV_MUTABLE_AUDIO_MIX = [AVMutableAudioMix class];
+        AV_AUDIO_MIX_INPUT_PARAMETERS = [AVAudioMixInputParameters class];
+        AV_MUTABLE_AUDIO_MIX_INPUT_PARAMETERS = [AVMutableAudioMixInputParameters class];
 
 #if TARGET_OS_WATCH
 #else
@@ -163,6 +176,11 @@ static void av_initializer(void)
         
         AV_URL_ASSET = [AVURLAsset class];
         
+        AV_PLAYER = [AVPlayer class];
+        AV_QUEUE_PLAYER = [AVQueuePlayer class];
+        AV_PLAYER_LOOPER = [AVPlayerLooper class];
+        AV_PLAYER_ITEM = [AVPlayerItem class];
+        AV_PLAYER_ITEM_VIDEO_OUTPUT = [AVPlayerItemVideoOutput class];
         
 #if TARGET_OS_WATCH
 #else
@@ -185,7 +203,7 @@ static void av_initializer(void)
         AV_AUDIO_FILE = [AVAudioFile class];
         AV_AUDIO_CHANNEL_LAYOUT = [AVAudioChannelLayout class];
         
-        AV_PLAYER = [AVPlayer class];
+        
 
         AV_SPEECH_SYNTHESIS_VOICE = [AVSpeechSynthesisVoice class];
         AV_SPEECH_SYNTHESIZER = [AVSpeechSynthesizer class];

@@ -21,6 +21,7 @@ pub use format_description::VideoFormatDesc;
 mod format_description_bridge;
 pub use format_description_bridge::ImageDescFlavor;
 pub use format_description_bridge::SoundDescFlavor;
+pub use format_description_bridge::TextDescFlavor;
 pub use format_description_bridge::err as format_desc_bridge_err;
 pub use format_description_bridge::swap_be_image_desc_to_host;
 pub use format_description_bridge::swap_be_sound_desc_to_host;
@@ -55,6 +56,27 @@ pub use time::TimeValue;
 
 pub mod sample_buffer;
 
+pub mod buffer_queue;
+pub use buffer_queue::Buf;
+pub use buffer_queue::BufBoolCb;
+#[cfg(feature = "blocks")]
+pub use buffer_queue::BufBoolHandler;
+pub use buffer_queue::BufCompareCb;
+#[cfg(feature = "blocks")]
+pub use buffer_queue::BufCompareHandler;
+#[cfg(feature = "blocks")]
+pub use buffer_queue::BufHandlers;
+pub use buffer_queue::BufQueue;
+pub use buffer_queue::BufQueueOf;
+pub use buffer_queue::BufSizeCb;
+#[cfg(feature = "blocks")]
+pub use buffer_queue::BufSizeHandler;
+pub use buffer_queue::BufTimeCb;
+#[cfg(feature = "blocks")]
+pub use buffer_queue::BufTimeHandler;
+pub use buffer_queue::SampleBufQueue;
+pub use buffer_queue::err as buf_queue_err;
+
 #[cfg(feature = "cat")]
 pub use sample_buffer::BlockBufAudioBufList;
 #[cfg(feature = "cat")]
@@ -77,6 +99,12 @@ pub mod sync;
 pub use sync::Clock;
 pub use sync::ClockOrTimebase;
 pub use sync::Timebase;
+
+#[cfg(not(target_os = "macos"))]
+pub mod audio_clock;
+
+#[cfg(target_os = "macos")]
+pub mod audio_device_clock;
 
 pub mod memory_pool;
 pub use memory_pool::MemPool;

@@ -91,8 +91,15 @@ pub mod player;
 pub use player::ActionAtItemEnd as PlayerActionAtItemEnd;
 pub use player::AudiovisualBackgroundPlaybackPolicy as PlayerAudiovisualBackgroundPlaybackPolicy;
 pub use player::HdrMode as PlayerHdrMode;
+pub use player::ItemOutput as PlayerItemOutput;
 pub use player::ItemStatus as PlayerItemStatus;
+pub use player::ItemVideoOutput as PlayerItemVideoOutput;
 pub use player::Player;
+pub use player::PlayerItem;
+pub use player::PlayerItemTrack;
+pub use player::PlayerLooper;
+pub use player::PlayerLooperItemOrdering;
+pub use player::PlayerLooperStatus;
 pub use player::QueuePlayer;
 pub use player::Status as PlayerStatus;
 pub use player::TimeControlStatus as PlayerTimeControlStatus;
@@ -116,6 +123,7 @@ pub use asset::ReaderOutput as AssetReaderOutput;
 pub use asset::ReaderOutput as AssetReaderOuput;
 pub use asset::ReaderStatus as AssetReaderStatus;
 pub use asset::ReaderTrackOutput as AssetReaderTrackOutput;
+pub use asset::Track as AssetTrack;
 pub use asset::UrlAsset;
 pub use asset::WriterInput as AssetWriterInput;
 pub use asset::WriterStatus as AssetWriterStatus;
@@ -149,6 +157,10 @@ pub use audio::InputNode as AudioInputNode;
 pub use audio::IoNode as AudioIoNode;
 #[cfg(feature = "blocks")]
 pub use audio::IoNodeInputBlock as AudioIoNodeInputBlock;
+pub use audio::Mix as AudioMix;
+pub use audio::MixInputParams as AudioMixInputParams;
+pub use audio::MixInputParamsMut as AudioMixInputParamsMut;
+pub use audio::MixMut as AudioMixMut;
 pub use audio::MixerNode as AudioMixerNode;
 pub use audio::Node as AudioNode;
 pub use audio::NodeBus as AudioNodeBus;
@@ -160,7 +172,9 @@ pub use audio::PcmBuf as AudioPcmBuf;
 pub use audio::Player as AudioPlayer;
 pub use audio::PlayerDelegate as AudioPlayerDelegate;
 pub use audio::PlayerNode as AudioPlayerNode;
+pub use audio::SpatializationFormats as AudioSpatializationFormats;
 pub use audio::Time as AudioTime;
+pub use audio::TimePitchAlgorithm as AudioTimePitchAlgorithm;
 pub use audio::VpOtherAudioDuckingCfg as AudioVpOtherAudioDuckingCfg;
 pub use audio::VpOtherAudioDuckingLevel as AudioVpOtherAudioDuckingLevel;
 pub use audio::VpSpeechActivityEvent as AudioVpSpeechActivityEvent;
@@ -283,3 +297,12 @@ pub use kit::PlayerViewControllerDelegateImpl;
 pub use kit::PlayerViewControllerSkippingBehavior;
 #[cfg(feature = "av_kit")]
 pub use kit::VideoFrameAnalysisType;
+
+#[cfg(all(feature = "av_kit", target_os = "ios"))]
+pub use kit::AnyInputPickerInteractionDelegate;
+#[cfg(all(feature = "av_kit", target_os = "ios"))]
+pub use kit::InputPickerInteraction;
+#[cfg(all(feature = "av_kit", target_os = "ios"))]
+pub use kit::InputPickerInteractionDelegate;
+#[cfg(all(feature = "av_kit", target_os = "ios"))]
+pub use kit::InputPickerInteractionDelegateImpl;
