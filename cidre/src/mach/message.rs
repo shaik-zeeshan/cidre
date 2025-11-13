@@ -176,7 +176,8 @@ impl DescType {
     pub const MAX: Self = Self::GuardedPort;
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_type_descriptor_t")]
+#[repr(C, packed(4))]
 pub struct TypeDesc {
     pub pad1: Natural,
     pub pad2: Size,
@@ -184,7 +185,8 @@ pub struct TypeDesc {
     pub type_: DescType,
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_port_descriptor_t")]
+#[repr(C, packed(4))]
 pub struct PortDesc {
     pub name: Port,
     pub pad1: Size,
@@ -193,7 +195,8 @@ pub struct PortDesc {
     pub type_: DescType,
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_ool_descriptor32_t")]
+#[repr(C, packed(4))]
 pub struct OolDesc32 {
     pub address: u32,
     pub size: Size,
@@ -202,7 +205,8 @@ pub struct OolDesc32 {
     pub type_: DescType,
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_ool_descriptor64_t")]
+#[repr(C, packed(4))]
 pub struct OolDesc64 {
     pub address: u64,
     pub size: Size,
@@ -211,7 +215,8 @@ pub struct OolDesc64 {
     pub type_: DescType,
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_ool_descriptor_t")]
+#[repr(C, packed(4))]
 pub struct OolDesc {
     pub address: *mut c_void,
     pub deallocate: u8,
@@ -221,12 +226,16 @@ pub struct OolDesc {
     pub size: Size,
 }
 
-#[repr(C, align(4))]
+#[derive(Debug)]
+#[doc(alias = "mach_msg_body_t")]
+#[repr(C, packed(4))]
 pub struct Body {
     pub descriptor_count: Size,
 }
 
-#[repr(C, align(4))]
+#[derive(Debug)]
+#[doc(alias = "mach_msg_header_t")]
+#[repr(C, packed(4))]
 pub struct Header {
     pub bits: HeaderBits,
     pub size: Size,
@@ -236,20 +245,24 @@ pub struct Header {
     pub id: Id,
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_base_t")]
+#[repr(C, packed(4))]
 pub struct Base {
     pub header: Header,
     pub body: Body,
 }
 
+#[doc(alias = "mach_msg_trailer_size_t")]
 pub type TrailerSize = u32;
 
+#[doc(alias = "mach_msg_trailer_type_t")]
 #[repr(u32)]
 pub enum TrailerType {
     Format0,
 }
 
-#[repr(C, align(4))]
+#[doc(alias = "mach_msg_trailer_t")]
+#[repr(C, packed(4))]
 pub struct Trailer {
     pub type_: TrailerType,
     pub size: TrailerSize,
@@ -451,88 +464,115 @@ define_opts!(
 );
 
 impl MsgOpt {
+    #[doc(alias = "MACH_MSG_OPTION_NONE")]
     pub const NONE: Self = Self(0x00000000);
 
+    #[doc(alias = "MACH_SEND_MSG")]
     pub const SEND_MSG: Self = Self(0x00000001);
+
     #[doc(alias = "MACH_RCV_MSG")]
     pub const RCV_MSG: Self = Self(0x00000002);
 
     /// report large message sizes
+    #[doc(alias = "MACH_RCV_LARGE")]
     pub const RCV_LARGE: Self = Self(0x00000004);
 
     /// identify source of large messages
+    #[doc(alias = "MACH_RCV_LARGE_IDENTITY")]
     pub const RCV_LARGE_IDENTITY: Self = Self(0x00000008);
 
     /// timeout value applies to send
+    #[doc(alias = "MACH_SEND_TIMEOUT")]
     pub const SEND_TIMEOUT: Self = Self(0x00000010);
 
     /// priority override for send
+    #[doc(alias = "MACH_SEND_OVERRIDE")]
     pub const SEND_OVERRIDE: Self = Self(0x00000020);
 
     /// don't restart interrupted sends
+    #[doc(alias = "MACH_SEND_INTERRUPT")]
     pub const SEND_INTERRUPT: Self = Self(0x00000040);
 
     /// arm send-possible notify
+    #[doc(alias = "MACH_SEND_NOTIFY")]
     pub const SEND_NOTIFY: Self = Self(0x00000080);
 
     /// ignore qlimits - kernel only
+    #[doc(alias = "MACH_SEND_ALWAYS")]
     pub const SEND_ALWAYS: Self = Self(0x00010000);
 
     /// rejection by message filter should return failure - user only
+    #[doc(alias = "MACH_SEND_FILTER_NONFATAL")]
     pub const SEND_FILTER_NONFATA: Self = Self(0x00010000);
 
     /// sender-provided trailer
+    #[doc(alias = "MACH_SEND_TRAILER")]
     pub const SEND_TRAILER: Self = Self(0x00020000);
 
     ///  msg won't carry importance
+    #[doc(alias = "MACH_SEND_NOIMPORTANCE")]
     pub const SEND_NOIMPORTANCE: Self = Self(0x00040000);
 
+    #[doc(alias = "MACH_SEND_NODENAP")]
     pub const SEND_NODENAP: Self = Self::SEND_NOIMPORTANCE;
 
     /// msg carries importance - kernel only
+    #[doc(alias = "MACH_SEND_IMPORTANCE")]
     pub const SEND_IMPORTANCE: Self = Self(0x00080000);
 
     /// msg should do sync IPC override (on legacy kernels)
+    #[doc(alias = "MACH_SEND_SYNC_OVERRIDE")]
     pub const SEND_SYNC_OVERRIDE: Self = Self(0x00100000);
 
     /// IPC should propagate the caller's QoS
+    #[doc(alias = "MACH_SEND_PROPAGATE_QOS")]
     pub const SEND_PROPAGATE_QOS: Self = Self(0x00200000);
 
     // spub const SEND_SYNC_USE_THRPRI: Self = Self::SEND_PROPAGATE_QOS;
 
     /// full send from kernel space - kernel only
+    #[doc(alias = "MACH_SEND_KERNEL")]
     pub const SEND_KERNEL: Self = Self(0x00400000);
 
     /// special reply port should boost thread doing sync bootstrap checkin
+    #[doc(alias = "MACH_SEND_SYNC_BOOTSTRAP_CHECKIN")]
     pub const SEND_SYNC_BOOTSTRAP_CHECKIN: Self = Self(0x00800000);
 
     /// timeout value applies to receive
+    #[doc(alias = "MACH_RCV_TIMEOUT")]
     pub const RCV_TIMEOUT: Self = Self(0x00000100);
 
     /// legacy name (value was: 0x00000200)
+    #[doc(alias = "MACH_RCV_NOTIFY")]
     pub const RCV_NOTIFY: Self = Self(0x00000000);
 
     /// don't restart interrupted receive
+    #[doc(alias = "MACH_RCV_INTERRUPT")]
     pub const RCV_INTERRUPT: Self = Self(0x00000400);
 
     /// willing to receive voucher port     
+    #[doc(alias = "MACH_RCV_VOUCHER")]
     pub const RCV_VOUCHER: Self = Self(0x00000800);
 
     // scatter receive (deprecated)
     // pub const RCV_OVERWRITE: Self = Self(0x00000000);
 
     /// Can receive new guarded descriptor
+    #[doc(alias = "MACH_RCV_GUARDED_DESC")]
     pub const RCV_GUARDED_DESC: Self = Self(0x00001000);
 
     /// sync waiter waiting for rcv
+    #[doc(alias = "MACH_RCV_SYNC_WAIT")]
     pub const RCV_SYNC_WAIT: Self = Self(0x00004000);
 
     /// sync waiter waiting to peek
+    #[doc = "MACH_RCV_SYNC_PEEK"]
     pub const RCV_SYNC_PEEK: Self = Self(0x00008000);
 
     /// Enforce specific properties about the reply port, and
     /// the context in which a thread replies to a message
     /// This flag must be passed on both the SEND and RCV
+    #[doc = "MACH_MSG_STRICT_REPLY"]
     pub const MSG_STRICT_REPLY: Self = Self(0x00000200);
 }
 

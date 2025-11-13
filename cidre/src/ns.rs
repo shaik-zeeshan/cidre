@@ -297,9 +297,21 @@ pub enum ExErr<'ar> {
     Err(&'ar Error),
 }
 
-#[cfg(any(feature = "app", feature = "ui"))]
+#[cfg(any(
+    all(
+        any(target_os = "ios", target_os = "tvos", target_os = "watchos"),
+        feature = "ui"
+    ),
+    all(target_os = "macos", feature = "app")
+))]
 mod text_attachment;
-#[cfg(any(feature = "app", feature = "ui"))]
+#[cfg(any(
+    all(
+        any(target_os = "ios", target_os = "tvos", target_os = "watchos"),
+        feature = "ui"
+    ),
+    all(target_os = "macos", feature = "app")
+))]
 pub use text_attachment::TextAttachment;
 
 pub use objc::ns::Integer;
@@ -311,11 +323,11 @@ pub use zone::Zone;
 #[objc::protocol(NSCopying)]
 pub trait Copying {
     #[objc::msg_send(copyWithZone:)]
-    unsafe fn copy_with_zone(&self, zone: *mut Zone) -> Option<arc::R<Id>>;
+    unsafe fn copy_with_zone(&self, zone: *mut Zone) -> Option<arc::Retained<Id>>;
 }
 
 #[objc::protocol(NSMutableCopying)]
 pub trait CopyingMut {
     #[objc::msg_send(mutableCopyWithZone:)]
-    unsafe fn copy_with_zone_mut(&self, zone: *mut Zone) -> Option<arc::R<Id>>;
+    unsafe fn copy_with_zone_mut(&self, zone: *mut Zone) -> Option<arc::Retained<Id>>;
 }

@@ -15,11 +15,11 @@ define_cf_type!(
 );
 
 pub type OutputCallback<T> = extern "C" fn(
-    output_callback_ref_con: *mut T,
-    source_frame_ref_con: *mut c_void,
+    output_cb_ref_con: *mut T,
+    src_frame_ref_con: *mut c_void,
     status: os::Status,
     info_flags: vt::EncodeInfoFlags,
-    sample_buffer: Option<&cm::SampleBuf>,
+    sample_buf: Option<&cm::SampleBuf>,
 );
 
 impl Session {
@@ -27,11 +27,11 @@ impl Session {
         width: u32,
         height: u32,
         codec: cm::VideoCodec,
-        encoder_specification: Option<&cf::Dictionary>,
-        source_image_buffer_attributes: Option<&cf::Dictionary>,
+        encoder_spec: Option<&cf::Dictionary>,
+        src_image_buf_attrs: Option<&cf::Dictionary>,
         compressed_data_allocator: Option<&cf::Allocator>,
-        output_callback: Option<OutputCallback<T>>,
-        output_callback_ref_con: *mut T,
+        output_cb: Option<OutputCallback<T>>,
+        output_cb_ref_con: *mut T,
     ) -> os::Result<arc::R<Self>> {
         unsafe {
             os::result_unchecked(|res| {
@@ -39,11 +39,11 @@ impl Session {
                     width as _,
                     height as _,
                     codec,
-                    encoder_specification,
-                    source_image_buffer_attributes,
+                    encoder_spec,
+                    src_image_buf_attrs,
                     compressed_data_allocator,
-                    std::mem::transmute(output_callback),
-                    std::mem::transmute(output_callback_ref_con),
+                    std::mem::transmute(output_cb),
+                    std::mem::transmute(output_cb_ref_con),
                     res,
                     None,
                 )
@@ -57,11 +57,11 @@ impl Session {
         width: i32,
         height: i32,
         codec_type: cm::VideoCodec,
-        encoder_specification: Option<&cf::Dictionary>,
-        source_image_buffer_attributes: Option<&cf::Dictionary>,
+        encoder_spec: Option<&cf::Dictionary>,
+        src_image_buf_attrs: Option<&cf::Dictionary>,
         compressed_data_allocator: Option<&cf::Allocator>,
-        output_callback: Option<OutputCallback<c_void>>,
-        output_callback_ref_con: *mut c_void,
+        output_cb: Option<OutputCallback<c_void>>,
+        output_cb_ref_con: *mut c_void,
         compression_session_out: *mut Option<arc::R<Session>>,
         allocator: Option<&cf::Allocator>,
     ) -> os::Result {
@@ -71,11 +71,11 @@ impl Session {
                 width,
                 height,
                 codec_type,
-                encoder_specification,
-                source_image_buffer_attributes,
+                encoder_spec,
+                src_image_buf_attrs,
                 compressed_data_allocator,
-                output_callback,
-                output_callback_ref_con,
+                output_cb,
+                output_cb_ref_con,
                 compression_session_out,
             )
             .result()
@@ -91,14 +91,6 @@ impl Session {
     #[doc(alias = "VTCompressionSessionPrepareToEncodeFrames")]
     #[inline]
     pub fn prepare(&mut self) -> os::Result {
-        unsafe { self.prepare_to_encode_frames() }
-    }
-
-    /// #Safety
-    /// use `prepare`
-    #[doc(alias = "VTCompressionSessionPrepareToEncodeFrames")]
-    #[inline]
-    pub unsafe fn prepare_to_encode_frames(&mut self) -> os::Result {
         unsafe { VTCompressionSessionPrepareToEncodeFrames(self).result() }
     }
 
@@ -112,21 +104,21 @@ impl Session {
     #[inline]
     pub fn encode_frame(
         &self,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
-        frame_properties: Option<&cf::DictionaryOf<cf::String, cf::Type>>,
-        source_frame_ref_con: *mut c_void,
+        frame_props: Option<&cf::DictionaryOf<cf::String, cf::Type>>,
+        src_frame_ref_con: *mut c_void,
         info_flags_out: *mut Option<NonNull<vt::EncodeInfoFlags>>,
     ) -> os::Result {
         unsafe {
             VTCompressionSessionEncodeFrame(
                 self,
-                image_buffer,
+                image_buf,
                 pts,
                 duration,
-                frame_properties,
-                source_frame_ref_con,
+                frame_props,
+                src_frame_ref_con,
                 info_flags_out,
             )
             .result()
@@ -137,13 +129,13 @@ impl Session {
     #[inline]
     pub fn enc_frame(
         &self,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
         info_flags_out: *mut Option<NonNull<vt::EncodeInfoFlags>>,
     ) -> os::Result {
         self.encode_frame(
-            image_buffer,
+            image_buf,
             pts,
             duration,
             None,
@@ -157,20 +149,20 @@ impl Session {
     #[inline]
     pub fn encode_frame_with_output_handler(
         &mut self,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
-        frame_properties: Option<&cf::Dictionary>,
+        frame_props: Option<&cf::Dictionary>,
         info_flags_out: *mut Option<NonNull<vt::EncodeInfoFlags>>,
         block: &'static mut OutputHandler,
     ) -> os::Result {
         unsafe {
             VTCompressionSessionEncodeFrameWithOutputHandler(
                 self,
-                image_buffer,
+                image_buf,
                 pts,
                 duration,
-                frame_properties,
+                frame_props,
                 info_flags_out,
                 block,
             )
@@ -183,20 +175,20 @@ impl Session {
     #[inline]
     pub fn enc_frame_with_output_handler_block(
         &mut self,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
-        frame_properties: Option<&cf::Dictionary>,
+        frame_props: Option<&cf::Dictionary>,
         info_flags_out: *mut Option<NonNull<vt::EncodeInfoFlags>>,
         block: &mut OutputHandler,
     ) -> os::Result {
         unsafe {
             VTCompressionSessionEncodeFrameWithOutputHandler(
                 self,
-                image_buffer,
+                image_buf,
                 pts,
                 duration,
-                frame_properties,
+                frame_props,
                 info_flags_out,
                 block,
             )
@@ -208,19 +200,19 @@ impl Session {
     #[inline]
     pub fn enc_frame_with_output_handler(
         &mut self,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
-        frame_properties: Option<&cf::Dictionary>,
+        frame_props: Option<&cf::Dictionary>,
         info_flags_out: *mut Option<NonNull<vt::EncodeInfoFlags>>,
         block: impl FnMut(os::Status, vt::EncodeInfoFlags, Option<&cm::SampleBuf>) + Send + 'static,
     ) -> os::Result {
         let mut block = OutputHandler::new3(block);
         self.enc_frame_with_output_handler_block(
-            image_buffer,
+            image_buf,
             pts,
             duration,
-            frame_properties,
+            frame_props,
             info_flags_out,
             &mut block,
         )
@@ -234,14 +226,8 @@ impl Session {
 
     #[doc(alias = "VTCompressionSessionCompleteFrames")]
     #[inline]
-    pub fn complete_frames(&self, complete_until_pts: cm::Time) -> os::Result {
-        unsafe { VTCompressionSessionCompleteFrames(self, complete_until_pts).result() }
-    }
-
-    #[doc(alias = "VTCompressionSessionCompleteFrames")]
-    #[inline]
-    pub fn complete_until_pts(&self, complete_until_pts: cm::Time) -> os::Result {
-        self.complete_frames(complete_until_pts)
+    pub fn complete_frames(&self, until_pts: cm::Time) -> os::Result {
+        unsafe { VTCompressionSessionCompleteFrames(self, until_pts).result() }
     }
 
     #[doc(alias = "VTCompressionSessionCompleteFrames")]
@@ -271,10 +257,10 @@ unsafe extern "C" {
         height: i32,
         codec_type: cm::VideoCodec,
         encoder_specification: Option<&cf::Dictionary>,
-        source_image_buffer_attributes: Option<&cf::Dictionary>,
+        src_image_buf_attrs: Option<&cf::Dictionary>,
         compressed_data_allocator: Option<&cf::Allocator>,
-        output_callback: Option<OutputCallback<c_void>>,
-        output_callback_ref_con: *mut c_void,
+        output_cb: Option<OutputCallback<c_void>>,
+        output_cb_ref_con: *mut c_void,
         compression_session_out: *mut Option<arc::Retained<Session>>,
     ) -> os::Status;
 
@@ -282,18 +268,18 @@ unsafe extern "C" {
     fn VTCompressionSessionPrepareToEncodeFrames(session: &mut Session) -> os::Status;
     fn VTCompressionSessionEncodeFrame(
         session: &Session,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
         frame_properties: Option<&cf::DictionaryOf<cf::String, cf::Type>>,
-        source_frame_ref_con: *mut c_void,
+        src_frame_ref_con: *mut c_void,
         info_flags_out: *mut Option<NonNull<vt::EncodeInfoFlags>>,
     ) -> os::Status;
 
     #[cfg(feature = "blocks")]
     fn VTCompressionSessionEncodeFrameWithOutputHandler(
         session: &Session,
-        image_buffer: &cv::ImageBuf,
+        image_buf: &cv::ImageBuf,
         pts: cm::Time,
         duration: cm::Time,
         frame_properties: Option<&cf::Dictionary>,
@@ -330,9 +316,9 @@ mod tests {
         .unwrap();
 
         if api::macos_available("26.0") {
-            let val = session
+            let _val = session
                 .prop(unsafe {
-                    vt::compression_properties::keys::supported_preset_dictionaries().unwrap()
+                    vt::compression_props_keys::supported_preset_dictionaries().unwrap()
                 })
                 .unwrap();
         }
